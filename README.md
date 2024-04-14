@@ -16,7 +16,9 @@ or
 
 Fromhex supports inline mode that you can enable by passing "i" after your hex string.
 
-For example, `./fromhex deadbeef i` would output raw de, ad, be, ef bytes. You can check that with hexdump -C.
+For example, `./fromhex deadbeef i` would output raw de, ad, be, ef bytes instead of human-readable format. You can check that with hexdump -C.
+
+To take input from stdin, pass - instead of the hexstring. For example, `echo dead00beef | fromhex - i` would output raw de, ad, 00, be, ef bytes. It ignores newlines by default, otherwise it would error out on line breaks.
 
 Inline mode is useful for command chaining and scripts in general.
 
