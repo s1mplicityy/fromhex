@@ -71,8 +71,43 @@ int main(int argc, char** argv)
     }
 
     char* bytes = argv[1];
-
     size_t bytesLen = strlen(bytes);
+    char readFromStdin = 0;
+
+    if (!strcmp(argv[1], "-"))
+    {
+        // Read from stdin
+        char *buffer = NULL;
+        size_t bufsize = 10; // Initial buffer size
+        size_t len = 0; // Current length of input
+        int c;
+
+        buffer = (char *)malloc(bufsize * sizeof(char));
+        if (buffer == NULL) {
+            perror("malloc");
+            exit(EXIT_FAILURE);
+        }
+
+        while ((c = getchar()) != EOF) {
+            if (c == '\n') continue;
+            // Check if buffer needs to be resized
+            if (len + 1 >= bufsize) {
+                bufsize *= 2;
+                buffer = (char *)realloc(buffer, bufsize * sizeof(char));
+                if (buffer == NULL) {
+                    perror("realloc");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            buffer[len++] = (char)c;
+        }
+        buffer[len] = '\0';
+
+        bytes = buffer;
+        readFromStdin = 1;
+        bytesLen = len;
+    }
+
     if (bytesLen % 2 != 0)
     {
         fprintf(stderr, "Invalid hex string: incomplete byte: %c\n", bytes[bytesLen-1]);
@@ -86,7 +121,6 @@ int main(int argc, char** argv)
         char hexVal = bytes[bytesLen - i - 1];
         int value = toIntValue(hexVal);
         uint64_t adjustedValue = value * pow(16, i);
-        // printf("Identifier %d: %c = %d\n", i, hexVal, adjustedValue);
         totalValueDec += adjustedValue;
     }
 
@@ -104,15 +138,20 @@ int main(int argc, char** argv)
     {
         printf("Representations of 0x%s\n", bytes);
         printf("Dec: %llu\n", totalValueDec);
-        printf("Txt: %s\n", reprDecoded);
+        printf("Txt: ");
+        for (int i = 0; i < bytesLen / 2; i++) printf("%c", reprDecoded[i]);
+        printf("\n");
     }
     else if (!strcmp(argv[2], "i"))
     {
-        printf("%s", reprDecoded);
+        for (int i = 0; i < bytesLen / 2; i++) printf("%c", reprDecoded[i]);
     }
     else
     {
         fprintf(stderr, "Invalid flag: %s\n", argv[2]);
+        if (readFromStdin == 1) free(bytes);
         exit(0);
     }
+
+    if (readFromStdin == 1) free(bytes);
 }
