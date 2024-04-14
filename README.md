@@ -2,7 +2,11 @@
 Extremely simple command line utility to convert hex strings into raw bytes.
 
 # Usage
-Compile main.c for your targets and run it:
+Compile main.c for your system:
+
+`gcc -lm -O3 -o fromhex main.c`
+
+After the build is completed, you can run it:
 
 `./fromhex deadbeef`
 
